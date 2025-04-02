@@ -14,6 +14,9 @@ export const size = {
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const iropke = await readFile(join(process.cwd(), 'src/assets/fonts/IropkeBatang.woff'));
+  const bgImage = await readFile(join(process.cwd(), 'public/open-bg.png'));
+  const bgBase64 = `data:image/png;base64,${bgImage.toString('base64')}`;
+
   let renderText = '에피그램';
 
   try {
@@ -35,7 +38,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
           fontSize: 100,
           fontWeight: 'bold',
           color: 'black',
-          backgroundImage: `url(${process.env.APP_URL}/open-bg.png)`,
+          backgroundImage: `url(${bgBase64})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
