@@ -78,9 +78,12 @@ export const getEpigramDetails = async (epigramId: number) => {
  * 에피그램 상세 조회 (서버용)
  */
 export const getEpigramDetailsOnServer = async (epigramId: number) => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/epigrams/${epigramId}`, {
-    method: 'GET',
-  });
+  const response = await fetch(
+    `https://fe-project-epigram-api.vercel.app/12-4/epigrams/${epigramId}`,
+    {
+      method: 'GET',
+    },
+  );
 
   if (!response.ok) {
     throw new Error('An error occurred while fetching data');
