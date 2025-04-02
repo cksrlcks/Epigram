@@ -13,8 +13,8 @@ export const size = {
 
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const iropke = await readFile(join(process.cwd(), 'src/assets/fonts/IropkeBatang.woff'));
-  const bgImage = await readFile(join(process.cwd(), 'src/assets/img/open-bg.png'));
+  const iropke = await readFile(join(process.cwd(), 'edge/IropkeBatang.woff'));
+  const bgImage = await readFile(join(process.cwd(), 'edge/open-bg.png'));
   const bgBase64 = `data:image/png;base64,${bgImage.toString('base64')}`;
   let renderText = '에피그램';
 
