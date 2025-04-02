@@ -14,17 +14,17 @@ export const size = {
 
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  // const iropke = await fetch(new URL('./IropkeBatang.woff', import.meta.url)).then((res) =>
-  //   res.arrayBuffer(),
-  // );
 
-  // const bg = await fetch(new URL('./open-bg.png', import.meta.url)).then((res) =>
-  //   res.arrayBuffer(),
-  // );
+  const iropke = await fetch('https://epigramogtest.vercel.app/IropkeBatang.woff').then((res) =>
+    res.arrayBuffer(),
+  );
 
-  // const bgBase64 = `data:image/png;base64,${Buffer.from(bg).toString('base64')}`;
+  const bg = await fetch('https://epigramogtest.vercel.app/open-bg.png').then((res) =>
+    res.arrayBuffer(),
+  );
 
   let renderText = '에피그램';
+  const bgBase64 = `data:image/png;base64,${Buffer.from(bg).toString('base64')}`;
 
   try {
     const { content } = await getEpigramDetailsOnServer(Number(id));
@@ -45,9 +45,9 @@ export default async function Image({ params }: { params: Promise<{ id: string }
           fontSize: 100,
           fontWeight: 'bold',
           color: 'black',
-          // backgroundImage: `url(${bgBase64})`,
-          // backgroundSize: 'cover',
-          // backgroundPosition: 'center',
+          backgroundImage: `url(${bgBase64})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
         }}
       >
         {truncateText(renderText, 8)}
@@ -55,6 +55,14 @@ export default async function Image({ params }: { params: Promise<{ id: string }
     ),
     {
       ...size,
+      fonts: [
+        {
+          name: 'Iropke',
+          data: iropke,
+          style: 'normal',
+          weight: 400,
+        },
+      ],
     },
   );
 }
