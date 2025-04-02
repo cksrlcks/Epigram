@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { getEpigramDetailsOnServer } from '@/apis/epigram/epigram.service';
 import { truncateText } from '@/utils/truncateText';
 
+export const runtime = 'nodejs';
 export const contentType = 'image/png';
 export const alt = '에피그램';
 export const size = {
