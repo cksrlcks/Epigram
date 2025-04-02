@@ -11,8 +11,9 @@ export const size = {
 
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  console.log(process.env.NODE_ENV);
   const host =
-    process.env.NEXT_RUNTIME === 'edge'
+    process.env.NODE_ENV === 'production'
       ? 'https://epigramogtest.vercel.app'
       : 'http://localhost:3000';
 
