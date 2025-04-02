@@ -1,6 +1,4 @@
 import { ImageResponse } from 'next/og';
-import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
 import { getEpigramDetailsOnServer } from '@/apis/epigram/epigram.service';
 import { truncateText } from '@/utils/truncateText';
 
@@ -13,48 +11,79 @@ export const size = {
 
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const iropke = await readFile(join(process.cwd(), 'IropkeBatang.woff'));
-  // const bgImage = await readFile(join(process.cwd(), 'open-bg.png'));
-  // const bgBase64 = `data:image/png;base64,${bgImage.toString('base64')}`;
-  let renderText = '에피그램';
+  const host =
+    process.env.NEXT_RUNTIME === 'edge'
+      ? 'https://epigramogtest.vercel.app'
+      : 'http://localhost:3000';
 
   try {
-    const { content } = await getEpigramDetailsOnServer(Number(id));
-    renderText = content;
-  } catch (error) {
-    console.error(error);
-  }
+    const [fontRes, bgRes, epigramRes] = await Promise.all([
+      fetch(`${host}/IropkeBatang.woff`),
+      fetch(`${host}/open-bg.png`),
+      getEpigramDetailsOnServer(Number(id)),
+    ]);
 
-  return new ImageResponse(
-    (
-      <div
-        style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          fontSize: 100,
-          fontWeight: 'bold',
-          color: 'black',
-          // backgroundImage: `url(${bgBase64})`,
-          // backgroundSize: 'cover',
-          // backgroundPosition: 'center',
-        }}
-      >
-        {truncateText(renderText, 8)}
-      </div>
-    ),
-    {
-      ...size,
-      fonts: [
-        {
-          name: 'Iropke',
-          data: iropke,
-          style: 'normal',
-          weight: 400,
-        },
-      ],
-    },
-  );
+    if (!fontRes.ok) throw new Error('Font fetch failed');
+    if (!bgRes.ok) throw new Error('BG fetch failed');
+
+    const [iropke, bg] = await Promise.all([fontRes.arrayBuffer(), bgRes.arrayBuffer()]);
+    const bgBase64 = `data:image/png;base64,${Buffer.from(bg).toString('base64')}`;
+    const { content } = epigramRes;
+
+    return new ImageResponse(
+      (
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            fontSize: 100,
+            fontWeight: 'bold',
+            color: 'black',
+            backgroundImage: `url(${bgBase64})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
+          {truncateText(content, 8)}
+        </div>
+      ),
+      {
+        ...size,
+        fonts: [
+          {
+            name: 'Iropke',
+            data: iropke,
+            style: 'normal',
+            weight: 400,
+          },
+        ],
+      },
+    );
+  } catch {
+    return new ImageResponse(
+      (
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            fontSize: 100,
+            fontWeight: 'bold',
+            color: 'black',
+            backgroundColor: '#fafafa',
+          }}
+        >
+          에피그램
+        </div>
+      ),
+      {
+        ...size,
+      },
+    );
+  }
 }
