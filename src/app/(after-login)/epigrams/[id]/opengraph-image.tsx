@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { getEpigramDetailsOnServer } from '@/apis/epigram/epigram.service';
 import { truncateText } from '@/utils/truncateText';
+import { headers } from 'next/headers';
 
 export const contentType = 'image/png';
 export const alt = '에피그램';
@@ -11,16 +12,15 @@ export const size = {
 
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  console.log(process.env.NODE_ENV);
-  const host =
-    process.env.NODE_ENV === 'production'
-      ? 'https://epigramogtest.vercel.app'
-      : 'http://localhost:3000';
+  const header = await headers();
+  const host = header.get('host');
+  const protocol = host?.includes('localhost') ? 'http' : 'https';
+  const origin = `${protocol}://${host}`;
 
   try {
     const [fontRes, bgRes, epigramRes] = await Promise.all([
-      fetch(`${host}/IropkeBatang.woff`),
-      fetch(`${host}/open-bg.png`),
+      fetch(`${origin}/IropkeBatang.woff`),
+      fetch(`${origin}/open-bg.png`),
       getEpigramDetailsOnServer(Number(id)),
     ]);
 
